@@ -72,6 +72,32 @@
         </div>
       </section>
 
+      <section class="boss-panel hidden" id="bossPanel" aria-label="Boss surpresa">
+        <div class="boss-copy">
+          <span class="label">Boss surpresa</span>
+          <h2 id="bossName">Hamburguer Travado</h2>
+          <p id="bossMessage">O caminho foi bloqueado. Faca os passos extras antes do tempo acabar.</p>
+        </div>
+        <div class="boss-arena">
+          <div class="food-monster burger" id="bossMonster" aria-hidden="true">
+            <span class="monster-arm left"></span>
+            <span class="monster-arm right"></span>
+            <span class="monster-face"></span>
+          </div>
+          <div class="boss-timer">
+            <span>Tempo</span>
+            <strong id="bossTimer">10s</strong>
+          </div>
+        </div>
+        <div class="boss-goal">
+          <strong id="bossCounter">0/20 passos extras</strong>
+          <span id="bossReward">Recompensa: +35 moedas</span>
+        </div>
+        <div class="boss-progress" aria-label="Progresso contra o boss">
+          <span id="bossProgress"></span>
+        </div>
+      </section>
+
       <section class="panel main-panel" aria-label="Progresso da fase">
         <div class="level-row">
           <div>
@@ -134,7 +160,7 @@
         <article class="panel">
           <div class="section-head">
             <h2>Conquistas</h2>
-            <span id="badgeCount">0/12</span>
+            <span id="badgeCount">0/16</span>
           </div>
           <div class="badge-list" id="badges"></div>
         </article>
