@@ -1,0 +1,5 @@
+cloudflared.exe
+cloudflared*.log
+step-quest-local.pfx
+node_modules/
+deploy/
