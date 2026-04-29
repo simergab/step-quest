@@ -3,3 +3,7 @@ cloudflared*.log
 step-quest-local.pfx
 node_modules/
 deploy/
+tools/
+.gh-config/
+gh-login*.log
+.upload-*.json
