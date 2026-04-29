@@ -1,0 +1,13 @@
+{
+  "name": "step-quest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Step Quest: jogo web mobile de caminhada com sala online privada para dois jogadores.",
+  "main": "server-https.js",
+  "scripts": {
+    "start": "node server-https.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
