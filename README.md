@@ -66,6 +66,8 @@ automaticamente antes de voltar a contar.
 - Loja com 12 skins compraveis com moedas virtuais, cada uma mudando cor da roupa e da pele.
 - Feedback em tempo real: passos, pontos, calorias estimadas e progresso.
 - Bosses surpresa em momentos aleatorios: hamburguer, batata frita e refrigerante bloqueiam o caminho ate o jogador vencer uma caminhada extra cronometrada.
+- Sala de trofeus dos bosses, registrando vitorias por tipo de boss vencido.
+- Bosses com meta maior de passos recebem 15 segundos extras no cronometro.
 - Missoes, 16 conquistas, ranking pessoal e salvamento offline em `localStorage`.
 - Sala online privada para ate 2 jogadores no servidor local.
 - Vibracao e som curto quando o navegador permite.
