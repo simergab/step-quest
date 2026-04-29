@@ -19,7 +19,6 @@ const scoreEl = document.querySelector("#score");
 const caloriesEl = document.querySelector("#calories");
 const streakEl = document.querySelector("#streak");
 const sensorButton = document.querySelector("#sensorButton");
-const calibrateButton = document.querySelector("#calibrateButton");
 const stepButton = document.querySelector("#stepButton");
 const undoStepButton = document.querySelector("#undoStepButton");
 const sensorStatus = document.querySelector("#sensorStatus");
@@ -255,8 +254,8 @@ function resetSensorCalibration(showMessage = true) {
 
   if (showMessage) {
     sensorStatus.textContent =
-      "Sensor recalibrado. Fique parado por 3 segundos e depois caminhe normalmente.";
-    showToast("Calibracao reiniciada.");
+      "Sensor iniciado e calibrando. Fique parado por 3 segundos e depois caminhe normalmente.";
+    showToast("Sensor calibrando.");
     buzz(30);
   }
 }
@@ -457,7 +456,7 @@ async function enableSensor() {
       }
     }
 
-    resetSensorCalibration(false);
+    resetSensorCalibration(true);
 
     if (!motionEnabled) {
       if (hasMotion) window.addEventListener("devicemotion", handleMotion);
@@ -478,7 +477,7 @@ async function enableSensor() {
 
     sensorButton.textContent = "Sensor ativo";
     sensorStatus.textContent = window.isSecureContext
-      ? "Caminhe segurando o celular. Passos reais devem contar automaticamente."
+      ? "Sensor iniciado. Aguarde a calibracao e caminhe com o celular."
       : "Tentando sensor em HTTP. Se nao contar, o celular exige HTTPS.";
     showToast("Sensor ativado. Bora caminhar!");
     buzz(40);
@@ -625,6 +624,7 @@ function startGameView() {
   splash.classList.add("hidden");
   document.body.classList.remove("menu-open");
   showToast("Jogo iniciado. Bora caminhar!");
+  enableSensor();
 }
 
 function exitGameView() {
@@ -908,7 +908,6 @@ function render() {
 }
 
 sensorButton.addEventListener("click", enableSensor);
-calibrateButton.addEventListener("click", () => resetSensorCalibration(true));
 stepButton.addEventListener("click", () => addStep(1, "manual"));
 undoStepButton.addEventListener("click", removeStep);
 playButton.addEventListener("click", startGameView);
@@ -940,4 +939,12 @@ restoreOnlineRoom();
 if (!window.isSecureContext) {
   sensorStatus.textContent =
     "Sensor pode ser bloqueado em HTTP. Os botoes funcionam agora; para passos reais, use HTTPS.";
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {
+      // The game still works if PWA registration is unavailable.
+    });
+  });
 }
