@@ -26,6 +26,12 @@ Link publico temporario atual:
 https://archives-tribune-promising-spelling.trycloudflare.com
 ```
 
+Link publicado no Render:
+
+```text
+https://step-quest-503q.onrender.com
+```
+
 1. Abra o jogo pelo link publico acima. Se estiver na mesma rede Wi-Fi, tambem funciona em `https://192.168.1.6:8443`.
 2. Na tela inicial, escreva seu nome e toque em `Criar sala`.
 3. Envie o codigo da sala para seu amigo.
