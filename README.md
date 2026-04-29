@@ -11,8 +11,8 @@ indevidas.
 Abra `index.html` no navegador do celular ou computador.
 
 - Toque em `+1 passo` para simular caminhada imediatamente.
-- No celular, toque em `Usar sensor` e caminhe com o aparelho na mao.
-- Use `Calibrar` se a contagem do sensor parecer alta ou baixa.
+- No celular, toque em `Play`; o jogo tenta iniciar e calibrar o sensor automaticamente.
+- Use `Iniciar sensor` novamente se quiser recalibrar durante a partida.
 - Complete fases para desbloquear cenarios.
 - Ganhe pontos e moedas, depois gaste as moedas na `Loja de skins`.
 
@@ -70,9 +70,10 @@ de 3 segundos e volte a caminhar em ritmo normal.
 - Sala online privada para ate 2 jogadores no servidor local.
 - Vibracao e som curto quando o navegador permite.
 - Credito discreto: created by Biel e Jenny.
+- PWA instalavel no Android/iPhone pela opcao de adicionar a tela inicial.
 
 ## Observacao
 
 Google Fit e Apple Health exigem app nativo, OAuth e aprovacao das plataformas.
-Esta versao entrega uma alternativa web jogavel agora, com sensor de movimento
-quando disponivel e simulacao de passos como fallback.
+Como PWA, esta versao nao le diretamente esses apps de saude; ela usa o sensor
+de movimento do celular quando o navegador permite, com botoes manuais como fallback.
