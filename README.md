@@ -77,3 +77,11 @@ de 3 segundos e volte a caminhar em ritmo normal.
 Google Fit e Apple Health exigem app nativo, OAuth e aprovacao das plataformas.
 Como PWA, esta versao nao le diretamente esses apps de saude; ela usa o sensor
 de movimento do celular quando o navegador permite, com botoes manuais como fallback.
+
+## App Android alternativo
+
+Tambem ha um projeto Android em `android-step-quest/`. Ele abre o jogo publicado
+em uma WebView e usa o sensor nativo `TYPE_STEP_COUNTER` do Android por uma ponte
+JavaScript. Isso permite uma contagem de passos mais parecida com apps nativos.
+
+O APK de debug e gerado pelo GitHub Actions no workflow `Android APK`.
