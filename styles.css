@@ -297,6 +297,11 @@ h2 {
   background: linear-gradient(180deg, #121a33 0%, #293759 42%, #5c6484 43%, #2c3551 100%);
 }
 
+.scene-card.boss-lock {
+  border-color: rgba(240, 93, 94, 0.55);
+  animation: dangerPulse 900ms ease-in-out infinite;
+}
+
 .sky,
 .path {
   position: absolute;
@@ -451,6 +456,259 @@ h2 {
   margin: 4px auto 0;
   border-radius: 50%;
   background: rgba(16, 34, 47, 0.2);
+}
+
+.boss-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(240, 93, 94, 0.42);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 247, 235, 0.92) 100%),
+    repeating-linear-gradient(45deg, rgba(240, 93, 94, 0.12) 0 12px, transparent 12px 24px);
+  box-shadow: var(--shadow);
+}
+
+.boss-panel.hidden {
+  display: none;
+}
+
+.boss-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(247, 183, 51, 0.18), transparent);
+  transform: translateX(-100%);
+  animation: warningSweep 1.4s linear infinite;
+}
+
+.boss-copy,
+.boss-arena,
+.boss-goal,
+.boss-progress {
+  position: relative;
+  z-index: 1;
+}
+
+.boss-copy p {
+  max-width: 34ch;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.boss-arena {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.boss-timer {
+  min-width: 78px;
+  padding: 10px;
+  border: 1px solid rgba(240, 93, 94, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  text-align: center;
+  background: var(--coral);
+}
+
+.boss-timer span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.boss-timer strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.boss-goal {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.boss-goal strong {
+  font-size: 1rem;
+}
+
+.boss-goal span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.boss-progress {
+  grid-column: 1 / -1;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(240, 93, 94, 0.14);
+}
+
+.boss-progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--coral), var(--amber), var(--mint));
+  transition: width 180ms ease;
+}
+
+.food-monster {
+  position: relative;
+  width: 90px;
+  height: 84px;
+  border: 4px solid #fff;
+  box-shadow:
+    0 12px 24px rgba(16, 34, 47, 0.2),
+    inset 0 -10px 0 rgba(16, 34, 47, 0.08);
+  animation: bossBounce 620ms ease-in-out infinite;
+}
+
+.food-monster.burger {
+  border-radius: 999px 999px 24px 24px;
+  background:
+    radial-gradient(circle at 28% 16%, #fff7d6 0 3px, transparent 4px),
+    radial-gradient(circle at 48% 13%, #fff7d6 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 19%, #fff7d6 0 3px, transparent 4px),
+    linear-gradient(
+      180deg,
+      #f4bd62 0 35%,
+      #63a45b 36% 42%,
+      #ffd166 43% 53%,
+      #6b3f2a 54% 68%,
+      #d48755 69% 100%
+    );
+}
+
+.food-monster.fries {
+  width: 82px;
+  height: 88px;
+  border-radius: 16px 16px 22px 22px;
+  background: linear-gradient(180deg, transparent 0 22%, #e63946 23% 100%);
+}
+
+.food-monster.fries::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: -10px;
+  height: 48px;
+  background:
+    linear-gradient(90deg, transparent 0 5px, #f7d046 5px 15px, transparent 15px 20px),
+    linear-gradient(90deg, transparent 18px, #ffec7a 18px 28px, transparent 28px 34px),
+    linear-gradient(90deg, transparent 36px, #f7d046 36px 46px, transparent 46px);
+  transform: skewX(-4deg);
+}
+
+.food-monster.fries::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 10px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.food-monster.soda {
+  width: 72px;
+  height: 92px;
+  border-radius: 12px 12px 22px 22px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0 16px, transparent 16px),
+    linear-gradient(180deg, #f2f4f3 0 12%, #d62828 13% 100%);
+}
+
+.food-monster.soda::before {
+  content: "";
+  position: absolute;
+  top: -28px;
+  left: 42px;
+  width: 10px;
+  height: 40px;
+  border-radius: 999px;
+  background: #2f4858;
+  transform: rotate(20deg);
+}
+
+.food-monster.soda::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 7px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.monster-arm {
+  position: absolute;
+  top: 46%;
+  width: 28px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.monster-arm.left {
+  left: -24px;
+  transform: rotate(-24deg);
+}
+
+.monster-arm.right {
+  right: -24px;
+  transform: rotate(24deg);
+}
+
+.monster-face {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 36px;
+  height: 20px;
+  border-bottom: 5px solid var(--ink);
+  border-radius: 0 0 999px 999px;
+  transform: translate(-50%, -50%);
+}
+
+.monster-face::before,
+.monster-face::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.monster-face::before {
+  left: 2px;
+}
+
+.monster-face::after {
+  right: 2px;
 }
 
 .main-panel {
@@ -814,6 +1072,32 @@ h2 {
   }
 }
 
+@keyframes bossBounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes dangerPulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow);
+  }
+  50% {
+    box-shadow: 0 18px 44px rgba(240, 93, 94, 0.24);
+  }
+}
+
+@keyframes warningSweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @media (max-width: 620px) {
   .metrics {
     grid-template-columns: repeat(2, 1fr);
@@ -825,6 +1109,14 @@ h2 {
 
   .scene-card {
     min-height: 228px;
+  }
+
+  .boss-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .boss-arena {
+    justify-content: space-between;
   }
 }
 
@@ -844,5 +1136,10 @@ h2 {
 
   .wallet {
     min-width: 92px;
+  }
+
+  .boss-goal {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
