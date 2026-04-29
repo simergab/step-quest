@@ -20,10 +20,10 @@ Abra `index.html` no navegador do celular ou computador.
 
 O modo online foi feito para 2 jogadores em uma sala privada por codigo.
 
-Link publico temporario atual:
+Link publico atual:
 
 ```text
-https://archives-tribune-promising-spelling.trycloudflare.com
+https://step-quest-503q.onrender.com
 ```
 
 Link publicado no Render:
@@ -38,9 +38,8 @@ https://step-quest-503q.onrender.com
 4. Seu amigo abre o mesmo link, escreve o nome, digita o codigo e toca em `Entrar`.
 5. O jogo abre com a sala conectada. Se quiser jogar sozinho, toque apenas em `Play`.
 
-O servidor guarda a sala apenas enquanto estiver rodando neste computador. Por
-padrao, o link `192.168.1.6` funciona para pessoas na mesma rede Wi-Fi. Para um
-amigo fora da sua rede, sera necessario publicar o jogo ou criar um tunel HTTPS.
+O servidor guarda a sala em memoria. Se o Render reiniciar o servico, basta criar
+uma sala nova e enviar outro codigo para o amigo.
 
 ## Sensor no celular
 
@@ -54,10 +53,10 @@ https://192.168.1.6:8443
 Como o certificado e local e temporario, o celular pode mostrar um aviso de
 seguranca antes de abrir. Se isso acontecer, decida no proprio celular se quer
 continuar com o teste local. A alternativa sem aviso e publicar o jogo em uma
-hospedagem HTTPS confiavel. Depois que a pagina carregar, toque em `Usar sensor`,
+link HTTPS publicado. Depois que a pagina carregar, toque em `Iniciar sensor`,
 permita o movimento quando o navegador pedir e caminhe com o celular desbloqueado.
-Se a contagem parecer alta ou baixa, toque em `Calibrar`, fique parado por cerca
-de 3 segundos e volte a caminhar em ritmo normal.
+Se a contagem parecer alta ou baixa, toque em `Iniciar sensor` de novo; ele calibra
+automaticamente antes de voltar a contar.
 
 ## Funcionalidades
 
@@ -66,7 +65,8 @@ de 3 segundos e volte a caminhar em ritmo normal.
 - Pontos por passo, bonus por ritmo no minuto e multiplicador de horas ativas.
 - Loja com 12 skins compraveis com moedas virtuais, cada uma mudando cor da roupa e da pele.
 - Feedback em tempo real: passos, pontos, calorias estimadas e progresso.
-- Missoes, 12 conquistas, ranking pessoal e salvamento offline em `localStorage`.
+- Bosses surpresa em momentos aleatorios: hamburguer, batata frita e refrigerante bloqueiam o caminho ate o jogador vencer uma caminhada extra cronometrada.
+- Missoes, 16 conquistas, ranking pessoal e salvamento offline em `localStorage`.
 - Sala online privada para ate 2 jogadores no servidor local.
 - Vibracao e som curto quando o navegador permite.
 - Credito discreto: created by Biel e Jenny.
