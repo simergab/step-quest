@@ -122,6 +122,7 @@ let motion = createMotionState();
 let online = loadOnlineState();
 let onlineSyncTimer = null;
 let onlineSyncBusy = false;
+let nativePedometerReady = false;
 
 function createMotionState() {
   return {
@@ -327,6 +328,8 @@ function addStep(amount = 1, source = "manual") {
 
   if (source === "sensor" && motion.stepTimes.length < 2) {
     sensorStatus.textContent = "Sensor ativo: passos detectados pelo movimento do celular.";
+  } else if (source === "native") {
+    sensorStatus.textContent = "Sensor nativo contabilizando passos do Android.";
   }
 }
 
@@ -430,6 +433,14 @@ function buyOrEquipSkin(skinId) {
 }
 
 async function enableSensor() {
+  if (window.AndroidStepQuest?.startStepCounter) {
+    nativePedometerReady = true;
+    sensorButton.textContent = "Sensor nativo ativo";
+    sensorStatus.textContent = "Iniciando sensor nativo do Android...";
+    window.AndroidStepQuest.startStepCounter();
+    return;
+  }
+
   const hasMotion = "DeviceMotionEvent" in window;
   const hasOrientation = "DeviceOrientationEvent" in window;
 
@@ -549,6 +560,23 @@ function handleOrientation(event) {
     addStep(1, "sensor");
   }
 }
+
+window.addEventListener("native-pedometer-ready", () => {
+  nativePedometerReady = true;
+  sensorButton.textContent = "Sensor nativo ativo";
+  sensorStatus.textContent = "App Android conectado ao sensor nativo de passos.";
+});
+
+window.StepQuestNativeSteps = {
+  addSteps(delta) {
+    const safeDelta = Math.max(0, Math.min(Number(delta) || 0, 20));
+    if (safeDelta <= 0) return;
+    addStep(safeDelta, "native");
+  },
+  setStatus(text) {
+    sensorStatus.textContent = String(text || "Sensor nativo ativo.");
+  },
+};
 
 function getLinearAcceleration(event) {
   const direct = event.acceleration;
