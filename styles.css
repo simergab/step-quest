@@ -522,6 +522,10 @@ h2 {
   margin-top: 14px;
 }
 
+.wide-action {
+  grid-column: 1 / -1;
+}
+
 .primary {
   color: #fff;
   background: var(--ink);
