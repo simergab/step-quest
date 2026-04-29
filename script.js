@@ -39,10 +39,21 @@ const roomCard = document.querySelector("#roomCard");
 const roomCodeEl = document.querySelector("#roomCode");
 const onlineBoard = document.querySelector("#onlineBoard");
 const onlineStatus = document.querySelector("#onlineStatus");
+const bossPanel = document.querySelector("#bossPanel");
+const bossNameEl = document.querySelector("#bossName");
+const bossMessageEl = document.querySelector("#bossMessage");
+const bossMonster = document.querySelector("#bossMonster");
+const bossTimerEl = document.querySelector("#bossTimer");
+const bossCounterEl = document.querySelector("#bossCounter");
+const bossRewardEl = document.querySelector("#bossReward");
+const bossProgressEl = document.querySelector("#bossProgress");
 
 const STORAGE_KEY = "step-quest-save-v1";
 const ONLINE_KEY = "step-quest-online-v1";
 const CALORIES_PER_STEP = 0.04;
+const BOSS_MIN_TOTAL_STEPS = 18;
+const BOSS_MIN_GAP_STEPS = 26;
+const BOSS_FORCE_GAP_STEPS = 78;
 
 const levels = [
   { name: "Bosque Inicial", steps: 20, scene: "forest", reward: 25 },
@@ -55,6 +66,42 @@ const levels = [
   { name: "Vale de Neve", steps: 300, scene: "snow", reward: 430 },
   { name: "Vulcao Ativo", steps: 390, scene: "volcano", reward: 560 },
   { name: "Orbita Final", steps: 500, scene: "space", reward: 750 },
+];
+
+const bossTypes = [
+  {
+    id: "burger",
+    name: "Hamburguer Travado",
+    className: "burger",
+    baseTarget: 20,
+    bonusTarget: 5,
+    seconds: 10,
+    rewardCoins: 35,
+    rewardScore: 150,
+    message: "Ele bloqueou a trilha. Venca com passos extras rapidos.",
+  },
+  {
+    id: "fries",
+    name: "Batata Frita Furiosa",
+    className: "fries",
+    baseTarget: 24,
+    bonusTarget: 6,
+    seconds: 12,
+    rewardCoins: 45,
+    rewardScore: 190,
+    message: "Ela tenta travar seu ritmo. Caminhe forte antes do cronometro zerar.",
+  },
+  {
+    id: "soda",
+    name: "Refrigerante Gelado",
+    className: "soda",
+    baseTarget: 28,
+    bonusTarget: 8,
+    seconds: 14,
+    rewardCoins: 55,
+    rewardScore: 230,
+    message: "Ele apareceu de surpresa. Complete a caminhada extra para liberar o caminho.",
+  },
 ];
 
 const skins = [
@@ -92,6 +139,10 @@ const badges = [
   { id: "b10", name: "Mestre dos mapas", text: "Chegou ao ultimo cenario.", test: (s) => s.levelIndex >= levels.length - 1 },
   { id: "b11", name: "Guarda-roupa cheio", text: "Desbloqueou todas as skins.", test: (s) => s.ownedSkins.length >= skins.length },
   { id: "b12", name: "Missao cumprida", text: "Concluiu todas as missoes.", test: (s) => s.claimedMissions.length >= missions.length },
+  { id: "b13", name: "Primeiro boss", text: "Venceu um boss surpresa.", test: (s) => (s.bossWins || 0) >= 1 },
+  { id: "b14", name: "Cardapio limpo", text: "Venceu 3 bosses de comida.", test: (s) => (s.bossWins || 0) >= 3 },
+  { id: "b15", name: "Cacador de lanches", text: "Venceu 7 bosses de comida.", test: (s) => (s.bossWins || 0) >= 7 },
+  { id: "b16", name: "Relogio rapido", text: "Venceu 12 bosses cronometrados.", test: (s) => (s.bossWins || 0) >= 12 },
 ];
 
 const defaultState = {
@@ -108,6 +159,9 @@ const defaultState = {
   ownedSkins: ["blue"],
   activeSkin: "blue",
   ranking: [],
+  bossWins: 0,
+  bossLosses: 0,
+  lastBossAt: 0,
 };
 
 let state = loadState();
@@ -123,6 +177,7 @@ let online = loadOnlineState();
 let onlineSyncTimer = null;
 let onlineSyncBusy = false;
 let nativePedometerReady = false;
+let bossRuntime = createBossRuntime();
 
 function createMotionState() {
   return {
@@ -133,6 +188,18 @@ function createMotionState() {
     warmup: 0,
     stepTimes: [],
     lastStatusAt: 0,
+  };
+}
+
+function createBossRuntime() {
+  return {
+    active: false,
+    type: null,
+    target: 0,
+    steps: 0,
+    startedAt: 0,
+    endAt: 0,
+    timerId: null,
   };
 }
 
@@ -198,6 +265,7 @@ function getOnlinePayload() {
     levelIndex: state.levelIndex,
     levelSteps: state.levelSteps,
     levelGoal: currentLevel().steps,
+    bossWins: state.bossWins || 0,
     updatedAt: Date.now(),
   };
 }
@@ -297,7 +365,14 @@ function minuteBonus(now) {
 }
 
 function addStep(amount = 1, source = "manual") {
-  for (let i = 0; i < amount; i += 1) {
+  const count = Math.max(1, Math.floor(Number(amount) || 1));
+
+  for (let i = 0; i < count; i += 1) {
+    if (bossRuntime.active) {
+      applyBossStep();
+      continue;
+    }
+
     const now = Date.now();
     recordMinuteStep(now);
     updateActiveStreak(now);
@@ -319,6 +394,7 @@ function addStep(amount = 1, source = "manual") {
     completeLevelsIfNeeded();
     checkMissions();
     checkBadges();
+    maybeStartBoss(source);
   }
 
   saveState();
@@ -326,7 +402,9 @@ function addStep(amount = 1, source = "manual") {
   animateStep();
   syncOnline(false);
 
-  if (source === "sensor" && motion.stepTimes.length < 2) {
+  if (bossRuntime.active) {
+    sensorStatus.textContent = "Boss ativo: passos extras contam para liberar o caminho.";
+  } else if (source === "sensor" && motion.stepTimes.length < 2) {
     sensorStatus.textContent = "Sensor ativo: passos detectados pelo movimento do celular.";
   } else if (source === "native") {
     sensorStatus.textContent = "Sensor nativo contabilizando passos do Android.";
@@ -334,6 +412,13 @@ function addStep(amount = 1, source = "manual") {
 }
 
 function removeStep() {
+  if (bossRuntime.active) {
+    bossRuntime.steps = Math.max(0, bossRuntime.steps - 1);
+    renderBoss();
+    showToast("1 passo extra removido do boss.");
+    return;
+  }
+
   if (state.totalSteps <= 0) {
     showToast("Ainda nao ha passos para remover.");
     return;
@@ -348,6 +433,116 @@ function removeStep() {
   render();
   syncOnline(false);
   showToast("1 passo removido.");
+}
+
+function maybeStartBoss(source) {
+  if (bossRuntime.active || state.totalSteps < BOSS_MIN_TOTAL_STEPS) return;
+
+  const lastBossAt = state.lastBossAt || 0;
+  const stepsSinceBoss = lastBossAt ? state.totalSteps - lastBossAt : state.totalSteps;
+  if (stepsSinceBoss < BOSS_MIN_GAP_STEPS) return;
+
+  const chance = source === "manual" ? 0.04 : 0.075;
+  if (stepsSinceBoss < BOSS_FORCE_GAP_STEPS && Math.random() > chance) return;
+
+  startBoss();
+}
+
+function startBoss() {
+  clearBossTimer();
+
+  const type = bossTypes[Math.floor(Math.random() * bossTypes.length)];
+  const levelBoost = Math.min(14, Math.floor(state.levelIndex * 1.8));
+  const randomBoost = Math.floor(Math.random() * (type.bonusTarget + 1));
+  const now = Date.now();
+
+  bossRuntime = {
+    active: true,
+    type,
+    target: type.baseTarget + randomBoost + levelBoost,
+    steps: 0,
+    startedAt: now,
+    endAt: now + type.seconds * 1000,
+    timerId: null,
+  };
+
+  state.lastBossAt = state.totalSteps;
+  bossRuntime.timerId = setInterval(updateBossTimer, 250);
+  saveState();
+  renderBoss();
+  showToast(`${type.name} apareceu! ${bossRuntime.target} passos extras!`);
+  buzz([70, 30, 70]);
+  beep();
+
+  window.requestAnimationFrame(() => {
+    bossPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+function applyBossStep() {
+  bossRuntime.steps += 1;
+  renderBoss();
+
+  if (bossRuntime.steps >= bossRuntime.target) {
+    defeatBoss();
+  }
+}
+
+function updateBossTimer() {
+  if (!bossRuntime.active) return;
+
+  renderBoss();
+  if (Date.now() >= bossRuntime.endAt) {
+    failBoss();
+  }
+}
+
+function clearBossTimer() {
+  if (bossRuntime.timerId) {
+    clearInterval(bossRuntime.timerId);
+  }
+}
+
+function defeatBoss() {
+  if (!bossRuntime.active) return;
+
+  const type = bossRuntime.type;
+  const coins = type.rewardCoins + Math.floor(bossRuntime.target / 2);
+  const points = type.rewardScore + bossRuntime.target * 5;
+
+  clearBossTimer();
+  state.bossWins = (state.bossWins || 0) + 1;
+  state.coins += coins;
+  state.score += points;
+  state.lastBossAt = state.totalSteps;
+
+  bossRuntime = createBossRuntime();
+  checkBadges();
+  saveState();
+  render();
+  syncOnline(false);
+  showToast(`${type.name} vencido! +${coins} moedas`);
+  buzz([80, 30, 80, 30, 120]);
+  beep();
+}
+
+function failBoss() {
+  if (!bossRuntime.active) return;
+
+  const type = bossRuntime.type;
+  const penalty = Math.min(40, state.score);
+
+  clearBossTimer();
+  state.bossLosses = (state.bossLosses || 0) + 1;
+  state.score = Math.max(0, state.score - penalty);
+  state.lastBossAt = state.totalSteps;
+
+  bossRuntime = createBossRuntime();
+  saveState();
+  render();
+  syncOnline(false);
+  showToast(`${type.name} escapou. Tente no proximo boss!`);
+  buzz([120, 50, 40]);
 }
 
 function completeLevelsIfNeeded() {
@@ -648,6 +843,30 @@ function renderScene(progress) {
   avatar.style.setProperty("--avatar-skin", skin.skinColor);
 }
 
+function renderBoss() {
+  if (!bossPanel || !bossProgressEl) return;
+
+  if (!bossRuntime.active) {
+    bossPanel.classList.add("hidden");
+    sceneCard.classList.remove("boss-lock");
+    return;
+  }
+
+  const type = bossRuntime.type;
+  const progress = Math.min(100, Math.round((bossRuntime.steps / bossRuntime.target) * 100));
+  const secondsLeft = Math.max(0, Math.ceil((bossRuntime.endAt - Date.now()) / 1000));
+
+  bossPanel.classList.remove("hidden");
+  sceneCard.classList.add("boss-lock");
+  bossNameEl.textContent = type.name;
+  bossMessageEl.textContent = type.message;
+  bossMonster.className = `food-monster ${type.className}`;
+  bossTimerEl.textContent = `${secondsLeft}s`;
+  bossCounterEl.textContent = `${bossRuntime.steps}/${bossRuntime.target} passos extras`;
+  bossRewardEl.textContent = `Recompensa: +${type.rewardCoins + Math.floor(bossRuntime.target / 2)} moedas`;
+  bossProgressEl.style.width = `${progress}%`;
+}
+
 function startGameView() {
   splash.classList.add("hidden");
   document.body.classList.remove("menu-open");
@@ -839,6 +1058,7 @@ function renderOnline() {
       <strong>${player.name}${player.id === online.playerId ? " (voce)" : ""}</strong>
       <span>${player.totalSteps} passos</span>
       <span>${player.score} pontos</span>
+      <span>${player.bossWins || 0} bosses vencidos</span>
       <span>${player.levelName}${stale ? " - offline?" : ""}</span>
     `;
     onlineBoard.appendChild(card);
@@ -928,6 +1148,7 @@ function render() {
   avatarLevel.textContent = `Nivel ${Math.floor(state.totalSteps / 50) + 1}`;
 
   renderScene(progress);
+  renderBoss();
   renderSkins();
   renderMissions();
   renderBadges();
