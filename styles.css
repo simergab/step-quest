@@ -835,13 +835,93 @@ h2 {
 
 .skin-list,
 .task-list,
-.badge-list {
+.badge-list,
+.boss-trophy-list {
   display: grid;
   gap: 8px;
 }
 
 .skin-list {
   grid-template-columns: repeat(2, 1fr);
+}
+
+.boss-trophy-panel {
+  grid-column: 1 / -1;
+}
+
+.boss-trophy-list {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.boss-trophy {
+  min-height: 162px;
+  padding: 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: center;
+  background: #fbfcf8;
+}
+
+.boss-trophy.unlocked {
+  border-color: rgba(247, 183, 51, 0.75);
+  background:
+    linear-gradient(180deg, rgba(255, 251, 230, 0.96), rgba(255, 255, 255, 0.96)),
+    linear-gradient(135deg, rgba(247, 183, 51, 0.2), transparent);
+  box-shadow: inset 0 0 0 2px rgba(247, 183, 51, 0.18);
+}
+
+.boss-trophy.locked {
+  filter: grayscale(0.65);
+  opacity: 0.72;
+}
+
+.boss-trophy strong,
+.boss-trophy span,
+.boss-trophy small {
+  display: block;
+}
+
+.boss-trophy strong {
+  min-height: 38px;
+  margin-top: 8px;
+  font-size: 0.92rem;
+  line-height: 1.18;
+}
+
+.boss-trophy span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.boss-trophy small {
+  margin-top: 6px;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.trophy-monster.food-monster {
+  width: 58px;
+  height: 56px;
+  margin: 2px auto 0;
+  border-width: 3px;
+  animation: none;
+}
+
+.trophy-monster.food-monster.fries {
+  width: 54px;
+  height: 58px;
+}
+
+.trophy-monster.food-monster.soda {
+  width: 48px;
+  height: 62px;
+}
+
+.trophy-monster .monster-arm {
+  display: none;
 }
 
 .skin {
@@ -1117,6 +1197,10 @@ h2 {
 
   .boss-arena {
     justify-content: space-between;
+  }
+
+  .boss-trophy-list {
+    grid-template-columns: 1fr;
   }
 }
 
