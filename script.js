@@ -27,6 +27,8 @@ const skinList = document.querySelector("#skinList");
 const missionsEl = document.querySelector("#missions");
 const badgesEl = document.querySelector("#badges");
 const badgeCount = document.querySelector("#badgeCount");
+const bossTrophyCount = document.querySelector("#bossTrophyCount");
+const bossTrophyList = document.querySelector("#bossTrophyList");
 const rankingEl = document.querySelector("#ranking");
 const toast = document.querySelector("#toast");
 const playerNameInput = document.querySelector("#playerName");
@@ -54,6 +56,8 @@ const CALORIES_PER_STEP = 0.04;
 const BOSS_MIN_TOTAL_STEPS = 18;
 const BOSS_MIN_GAP_STEPS = 26;
 const BOSS_FORCE_GAP_STEPS = 78;
+const BOSS_HEAVY_STEP_TARGET = 30;
+const BOSS_HEAVY_TIME_BONUS = 15;
 
 const levels = [
   { name: "Bosque Inicial", steps: 20, scene: "forest", reward: 25 },
@@ -162,6 +166,7 @@ const defaultState = {
   bossWins: 0,
   bossLosses: 0,
   lastBossAt: 0,
+  bossTrophies: {},
 };
 
 let state = loadState();
@@ -454,15 +459,19 @@ function startBoss() {
   const type = bossTypes[Math.floor(Math.random() * bossTypes.length)];
   const levelBoost = Math.min(14, Math.floor(state.levelIndex * 1.8));
   const randomBoost = Math.floor(Math.random() * (type.bonusTarget + 1));
+  const target = type.baseTarget + randomBoost + levelBoost;
+  const timeLimit = getBossTimeLimit(type, target);
   const now = Date.now();
 
   bossRuntime = {
     active: true,
     type,
-    target: type.baseTarget + randomBoost + levelBoost,
+    target,
+    timeLimit,
+    timeBonus: timeLimit - type.seconds,
     steps: 0,
     startedAt: now,
-    endAt: now + type.seconds * 1000,
+    endAt: now + timeLimit * 1000,
     timerId: null,
   };
 
@@ -477,6 +486,11 @@ function startBoss() {
   window.requestAnimationFrame(() => {
     bossPanel.scrollIntoView({ behavior: "smooth", block: "center" });
   });
+}
+
+function getBossTimeLimit(type, target) {
+  const heavyBoss = target >= BOSS_HEAVY_STEP_TARGET || target - type.baseTarget >= 8;
+  return type.seconds + (heavyBoss ? BOSS_HEAVY_TIME_BONUS : 0);
 }
 
 function applyBossStep() {
@@ -511,6 +525,8 @@ function defeatBoss() {
   const points = type.rewardScore + bossRuntime.target * 5;
 
   clearBossTimer();
+  state.bossTrophies = { ...(state.bossTrophies || {}) };
+  state.bossTrophies[type.id] = (state.bossTrophies[type.id] || 0) + 1;
   state.bossWins = (state.bossWins || 0) + 1;
   state.coins += coins;
   state.score += points;
@@ -863,7 +879,10 @@ function renderBoss() {
   bossMonster.className = `food-monster ${type.className}`;
   bossTimerEl.textContent = `${secondsLeft}s`;
   bossCounterEl.textContent = `${bossRuntime.steps}/${bossRuntime.target} passos extras`;
-  bossRewardEl.textContent = `Recompensa: +${type.rewardCoins + Math.floor(bossRuntime.target / 2)} moedas`;
+  bossRewardEl.textContent =
+    bossRuntime.timeBonus > 0
+      ? `Recompensa: +${type.rewardCoins + Math.floor(bossRuntime.target / 2)} moedas | +${bossRuntime.timeBonus}s`
+      : `Recompensa: +${type.rewardCoins + Math.floor(bossRuntime.target / 2)} moedas`;
   bossProgressEl.style.width = `${progress}%`;
 }
 
@@ -1120,6 +1139,33 @@ function renderBadges() {
   badgeCount.textContent = `${state.unlockedBadges.length}/${badges.length}`;
 }
 
+function renderBossTrophies() {
+  if (!bossTrophyList || !bossTrophyCount) return;
+
+  const trophies = state.bossTrophies || {};
+  const unlockedCount = bossTypes.filter((type) => (trophies[type.id] || 0) > 0).length;
+  bossTrophyCount.textContent = `${unlockedCount}/${bossTypes.length} bosses`;
+  bossTrophyList.innerHTML = "";
+
+  bossTypes.forEach((type) => {
+    const wins = trophies[type.id] || 0;
+    const unlocked = wins > 0;
+    const trophy = document.createElement("div");
+    trophy.className = `boss-trophy ${unlocked ? "unlocked" : "locked"}`;
+    trophy.innerHTML = `
+      <div class="trophy-monster food-monster ${type.className}" aria-hidden="true">
+        <span class="monster-arm left"></span>
+        <span class="monster-arm right"></span>
+        <span class="monster-face"></span>
+      </div>
+      <strong>${type.name}</strong>
+      <span>${unlocked ? "Trofeu liberado" : "Trofeu bloqueado"}</span>
+      <small>${wins} ${wins === 1 ? "vitoria" : "vitorias"}</small>
+    `;
+    bossTrophyList.appendChild(trophy);
+  });
+}
+
 function renderRanking() {
   rankingEl.innerHTML = "";
   const entries = state.ranking.length
@@ -1152,6 +1198,7 @@ function render() {
   renderSkins();
   renderMissions();
   renderBadges();
+  renderBossTrophies();
   renderRanking();
   renderOnline();
 }
