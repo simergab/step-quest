@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#10222f" />
+    <title>Step Quest</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="splash" id="splash" aria-label="Tela inicial">
+      <div class="splash-scene">
+        <div class="splash-avatar">
+          <div class="avatar-head"></div>
+          <div class="avatar-body"></div>
+          <div class="avatar-shadow"></div>
+        </div>
+      </div>
+      <div class="splash-content">
+        <p class="eyebrow">Pedometro game</p>
+        <h1>Step Quest</h1>
+        <p class="splash-copy">Caminhe na vida real, avance no mapa e desbloqueie recompensas.</p>
+        <div class="splash-online" aria-label="Sala online na tela inicial">
+          <input id="splashPlayerName" maxlength="14" autocomplete="off" placeholder="Seu nome" />
+          <div class="splash-room-row">
+            <button class="primary" id="splashCreateRoomButton" type="button">Criar sala</button>
+            <button class="calibrate" id="splashJoinRoomButton" type="button">Entrar</button>
+          </div>
+          <input id="splashRoomCodeInput" maxlength="6" autocomplete="off" placeholder="Codigo da sala" />
+          <p class="splash-room-code">Sala: <strong id="splashRoomCode">----</strong></p>
+          <p class="splash-note" id="splashOnlineStatus">Crie uma sala ou entre com o codigo do seu amigo.</p>
+        </div>
+        <div class="splash-actions">
+          <button class="primary" id="playButton" type="button">Play</button>
+          <button class="exit" id="exitButton" type="button">Exit</button>
+        </div>
+        <p class="splash-note" id="exitMessage">Use o celular para jogar com sensor.</p>
+      </div>
+      <p class="credits splash-credit">created by Biel e Jenny</p>
+    </section>
+
+    <main class="app" id="app">
+      <section class="topbar" aria-label="Resumo do jogador">
+        <div>
+          <p class="eyebrow">Pedometro game</p>
+          <h1>Step Quest</h1>
+        </div>
+        <div class="wallet">
+          <span>Moedas</span>
+          <strong id="coins">0</strong>
+        </div>
+      </section>
+
+      <section class="scene-card" id="sceneCard" aria-label="Cenario desbloqueado">
+        <div class="sky">
+          <div class="sun"></div>
+          <div class="cloud cloud-one"></div>
+          <div class="cloud cloud-two"></div>
+        </div>
+        <div class="path">
+          <div class="avatar" id="avatar" aria-label="Personagem">
+            <div class="avatar-head"></div>
+            <div class="avatar-body"></div>
+            <div class="avatar-shadow"></div>
+          </div>
+          <div class="finish-flag"></div>
+        </div>
+      </section>
+
+      <section class="panel main-panel" aria-label="Progresso da fase">
+        <div class="level-row">
+          <div>
+            <span class="label">Fase atual</span>
+            <h2 id="levelName">Bosque Inicial</h2>
+          </div>
+          <strong id="levelStepText">0/20</strong>
+        </div>
+
+        <div class="progress" aria-label="Progresso de passos">
+          <span id="progressFill"></span>
+        </div>
+
+        <div class="metrics">
+          <div>
+            <span>Passos</span>
+            <strong id="steps">0</strong>
+          </div>
+          <div>
+            <span>Pontos</span>
+            <strong id="score">0</strong>
+          </div>
+          <div>
+            <span>Calorias</span>
+            <strong id="calories">0</strong>
+          </div>
+          <div>
+            <span>Sequencia</span>
+            <strong id="streak">0h</strong>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="sensorButton" type="button">Usar sensor</button>
+          <button class="calibrate" id="calibrateButton" type="button">Calibrar</button>
+          <button class="secondary" id="stepButton" type="button">+1 passo</button>
+          <button class="undo-step" id="undoStepButton" type="button">-1 passo</button>
+        </div>
+        <p class="hint" id="sensorStatus">
+          Jogue agora com os botoes de passos. No celular, use HTTPS para liberar o sensor.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <div class="section-head">
+            <h2>Loja de skins</h2>
+            <span id="avatarLevel">Nivel 1</span>
+          </div>
+          <div class="skin-list" id="skinList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <h2>Missoes</h2>
+            <span>Hoje + semana</span>
+          </div>
+          <div class="task-list" id="missions"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <h2>Conquistas</h2>
+            <span id="badgeCount">0/12</span>
+          </div>
+          <div class="badge-list" id="badges"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <h2>Ranking pessoal</h2>
+            <span>Offline</span>
+          </div>
+          <ol class="rank-list" id="ranking"></ol>
+        </article>
+
+        <article class="panel online-panel">
+          <div class="section-head">
+            <h2>Sala online</h2>
+            <span id="onlineBadge">Privado</span>
+          </div>
+          <div class="online-actions">
+            <input id="playerName" maxlength="14" autocomplete="off" placeholder="Seu nome" />
+            <button class="primary" id="createRoomButton" type="button">Criar sala</button>
+            <input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Codigo" />
+            <button class="calibrate" id="joinRoomButton" type="button">Entrar</button>
+          </div>
+          <div class="room-card" id="roomCard">
+            <span>Codigo da sala</span>
+            <strong id="roomCode">----</strong>
+            <button class="exit small-button" id="leaveRoomButton" type="button">Sair</button>
+          </div>
+          <div class="online-board" id="onlineBoard"></div>
+          <p class="hint" id="onlineStatus">Crie uma sala e envie o codigo para seu amigo.</p>
+        </article>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <p class="credits">created by Biel e Jenny</p>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
