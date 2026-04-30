@@ -183,6 +183,8 @@ let onlineSyncTimer = null;
 let onlineSyncBusy = false;
 let nativePedometerReady = false;
 let bossRuntime = createBossRuntime();
+let stepAnimationTimer = null;
+let queuedStepAnimations = 0;
 
 function createMotionState() {
   return {
@@ -404,7 +406,7 @@ function addStep(amount = 1, source = "manual") {
 
   saveState();
   render();
-  animateStep();
+  animateStep(count);
   syncOnline(false);
 
   if (bossRuntime.active) {
@@ -614,11 +616,24 @@ function checkBadges() {
   });
 }
 
-function animateStep() {
+function animateStep(pulses = 1) {
+  queuedStepAnimations = Math.min(queuedStepAnimations + Math.max(1, pulses), 4);
+  runStepAnimationQueue();
+}
+
+function runStepAnimationQueue() {
+  if (stepAnimationTimer || queuedStepAnimations <= 0) return;
+
+  queuedStepAnimations -= 1;
   avatar.classList.remove("step");
-  window.requestAnimationFrame(() => {
-    avatar.classList.add("step");
-  });
+  void avatar.offsetWidth;
+  avatar.classList.add("step");
+
+  stepAnimationTimer = setTimeout(() => {
+    avatar.classList.remove("step");
+    stepAnimationTimer = null;
+    runStepAnimationQueue();
+  }, 330);
 }
 
 function buyOrEquipSkin(skinId) {
