@@ -399,10 +399,11 @@ h2 {
 
 .avatar {
   --walk: 0%;
+  --avatar-left: 52%;
   --avatar-shirt: var(--blue);
   --avatar-skin: #ffbf69;
   position: absolute;
-  left: calc(10% + (76% * var(--walk)));
+  left: var(--avatar-left);
   bottom: 34px;
   width: 74px;
   height: 116px;
