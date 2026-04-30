@@ -1,4 +1,4 @@
-const CACHE_NAME = "step-quest-v3";
+const CACHE_NAME = "step-quest-v4";
 const APP_SHELL = [
   "/",
   "/index.html",
