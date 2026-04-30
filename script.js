@@ -867,7 +867,9 @@ function renderScene(progress) {
   const scene = currentLevel().scene;
   if (scene !== "forest") sceneCard.classList.add(scene);
 
+  const avatarLeft = 52 + progress * 0.32;
   avatar.style.setProperty("--walk", `${progress}%`);
+  avatar.style.setProperty("--avatar-left", `${avatarLeft}%`);
   avatar.className = "avatar";
   const skin = skins.find((item) => item.id === state.activeSkin) || skins[0];
   avatar.style.setProperty("--avatar-shirt", skin.bodyColor);
